@@ -17,9 +17,9 @@ const registerUser = async (req, res) => {
     //Check if user already exists
     const userExists = await User.findOne({email});
     if(userExists)
-    {
-      return resizeBy.status(400).json({message: "User already exists"});
-    }
+{
+  return res.status(400).json({message: "User already exists"});
+}
 
     //Determine user role: Admin if correct token is provided, otherwise member
     let role = "member";
@@ -111,7 +111,7 @@ const getUserProfile = async (req, res) => {
 // @access  Private (Requires JWT)
 const updateUserProfile = async (req, res) => {
   try { 
-    const user = await user.findById(req.user.id);
+    const user = await User.findById(req.user.id);
 
     if(!user)
     {
