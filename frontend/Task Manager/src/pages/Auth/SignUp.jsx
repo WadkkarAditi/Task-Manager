@@ -8,6 +8,7 @@ import { toast } from "react-hot-toast";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 import {UserContext} from "../../context/userContext";
+import uploadImage from "../../utils/uploadImage";
 
 const SignUp = () => {
   const [profilePic, setProfilePic] = useState(null);
@@ -26,7 +27,7 @@ const SignUp = () => {
   const handleSignUp = async (e) => {
     e.preventDefault();
 
-    let profileImageUrl = ''
+    let profileImageUrl = "";
 
     if (!fullName) {
       setError("Please enter full name.");
@@ -59,7 +60,7 @@ const SignUp = () => {
         email,
         password,
         profileImageUrl,
-        adminInviteToken
+        adminInviteToken,
 
       });
 
@@ -77,6 +78,7 @@ const SignUp = () => {
         }
       }
     } catch (error){
+      setLoading(false);
         if (error.response && error.response.data.message)  {
           setError(error.response.data.message);
         } else {
