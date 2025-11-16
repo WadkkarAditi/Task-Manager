@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import AuthLayout from "../../components/layouts/AuthLayout";
 import { validateEmail } from "../../utils/helper";
 import ProfilePhotoSelector from "../../components/Inputs/ProfilePhotoSelector";
@@ -7,6 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
+import {UserContext} from "../../context/userContext";
 
 const SignUp = () => {
   const [profilePic, setProfilePic] = useState(null);
@@ -19,9 +20,13 @@ const SignUp = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const {updateUser} = useContext(UserContext)
+
   //handle SignUp form submit
   const handleSignUp = async (e) => {
     e.preventDefault();
+
+    let profileImageUrl = ''
 
     if (!fullName) {
       setError("Please enter full name.");
@@ -40,6 +45,44 @@ const SignUp = () => {
 
     setError("");
     setLoading(true);
+
+    try{
+
+      //Upload image if present
+      if (profilePic) {
+        const imgUploadRes = await uploadImage(profilePic);
+        profileImageUrl = imgUploadRes.imageUrl || "";
+      }
+
+      const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER, {
+        name: fullName,
+        email,
+        password,
+        profileImageUrl,
+        adminInviteToken
+
+      });
+
+      const {token, role } = response.data;
+
+      if(token) {
+        localStorage.setItem("token", token);
+        updateUser(response.data);
+
+        //Register based on role
+        if (role === "admin") {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/user/dashboard");
+        }
+      }
+    } catch (error){
+        if (error.response && error.response.data.message)  {
+          setError(error.response.data.message);
+        } else {
+          setError("Something went wrong. Please try again.");
+        }
+    }
 
     // 2. --- THE API LOGIC MOVED HERE ---
     try {
@@ -85,7 +128,7 @@ const SignUp = () => {
       setError(message);
       toast.error(message);
     }
-    // 3. --- END OF API LOGIC ---
+
   };
 
   return (
