@@ -14,6 +14,8 @@ const ProfilePhotoSelector= ({image, setImage}) =>
             //Generate preview URL from the file
             const preview= URL.createObjectURL(file);
             setPreviewUrl(preview);
+
+            setImage(file);
         }
     };
 

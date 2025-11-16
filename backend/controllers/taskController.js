@@ -155,9 +155,9 @@ const updateTask = async(req, res) => {
             {
                 return res
                     .status(400)
-                    .json({message:"assignedTo must be an array of user IDs"});
+                    .json({message:"assigned To must be an array of user IDs"});
             }
-            task.assignedTo = req.body.assignmentTo;
+            task.assignedTo = req.body.assignedTo;
         }
 
         const updateTask = await task.save();
@@ -273,8 +273,8 @@ const updateTaskChecklist = async(req, res) => {
 const getDashboardData = async(req, res) => {
     try {
         const totalTasks = await Task.countDocuments();
-        const pendingTasks = await Task.countDocuments({status:"Peding"});
-        const completedTasks = await Task.countDocuments({satus:"Completed"});
+        const pendingTasks = await Task.countDocuments({status:"Pending"});
+        const completedTasks = await Task.countDocuments({status:"Completed"});
         const overdueTasks = await Task.countDocuments({
             status:{ $ne:"Completed"},
             dueDate:{$lt: new Date()},
@@ -292,7 +292,7 @@ const getDashboardData = async(req, res) => {
 
         const taskDistribution = taskStatuses.reduce((acc, status) => {
             const formattedKey = status.replace(/\s+/g,"");   //Remove spaces from response keys
-            acc(formattedKey) = taskDistributionRaw.find((item) => item._id === status)?.count || 0;
+            acc[formattedKey] = taskDistributionRaw.find((item) => item._id === status)?.count || 0;
             return acc;
         }, {});
         taskDistribution["All"] = totalTasks;    //Add total count to TaskDistribution
@@ -374,8 +374,8 @@ const getUserDashboardData = async(req, res) => {
             {$group:{_id:"priority",count:{$sum:1}}},
         ]);
 
-        const  taskPriorityLevels = taskPriorities.reduce((acc, priority) =>{
-            acc[priority] = taskPriorityLevelsRaw.find((item) => item,_id === priority)?.count || 0;
+        const taskPriorityLevels = taskPriorities.reduce((acc, priority) =>{
+            acc[priority] = taskPriorityLevelsRaw.find((item) => item._id === priority)?.count || 0;
             return acc;
         },{});
 
