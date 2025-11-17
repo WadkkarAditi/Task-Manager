@@ -12,4 +12,4 @@ const InfoCard = ({icon, label, value, color}) => {
     )
 }
 
-export default InfoCard
+export default InfoCard;                
